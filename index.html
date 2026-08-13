@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Social Science CBA Analysis & Principal Report</title>
+  <!-- Chart.js for Visual Analytics -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    :root {
+      --primary: #1e3a8a;
+      --secondary: #0f766e;
+      --bg: #f8fafc;
+      --card-bg: #ffffff;
+      --text: #1e293b;
+      --border: #e2e8f0;
+      
+      /* Performance Colors */
+      --excellent: #16a34a;
+      --good: #2563eb;
+      --moderate: #d97706;
+      --improvement: #ea580c;
+      --intervention: #dc2626;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    body { background-color: var(--bg); color: var(--text); padding: 20px; line-height: 1.5; }
+    .container { max-width: 1400px; margin: 0 auto; }
+
+    /* Header & Action Bar */
+    header { background: var(--primary); color: white; padding: 24px; border-radius: 12px; margin-bottom: 24px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; }
+    header h1 { font-size: 1.5rem; }
+    header p { opacity: 0.9; font-size: 0.9rem; margin-top: 4px; }
+    .btn-group { display: flex; gap: 10px; }
+    .btn { padding: 10px 16px; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; transition: 0.2s; font-size: 0.9rem; }
+    .btn-excel { background: #107c41; color: white; }
+    .btn-pdf { background: #b91c1c; color: white; }
+    .btn:hover { opacity: 0.9; transform: translateY(-1px); }
+
+    /* Key Summary Cards */
+    .metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-bottom: 24px; }
+    .card { background: var(--card-bg); padding: 20px; border-radius: 10px; border: 1px solid var(--border); box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+    .card h3 { font-size: 0.85rem; text-transform: uppercase; color: #64748b; margin-bottom: 6px; }
+    .card .value { font-size: 1.8rem; font-weight: bold; color: var(--primary); }
+
+    /* Charts Section */
+    .charts-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 20px; margin-bottom: 24px; }
+    .chart-card { background: var(--card-bg); padding: 20px; border-radius: 10px; border: 1px solid var(--border); }
+    .chart-card h2 { font-size: 1.1rem; margin-bottom: 16px; color: var(--primary); }
+
+    /* Interactive Table Container */
+    .table-card { background: var(--card-bg); border-radius: 10px; border: 1px solid var(--border); overflow: hidden; margin-bottom: 24px; }
+    .table-card h2 { padding: 20px; font-size: 1.2rem; color: var(--primary); border-bottom: 1px solid var(--border); }
+    .table-container { overflow-x: auto; max-height: 600px; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.85rem; text-align: left; }
+    th, td { padding: 12px 14px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+    th { background: #f1f5f9; position: sticky; top: 0; z-index: 10; font-weight: 700; color: #334155; }
+    tr:hover { background-color: #f8fafc; }
+    
+    /* Badges */
+    .badge { padding: 4px 8px; border-radius: 4px; font-weight: 600; font-size: 0.75rem; text-align: center; display: inline-block; color: white; }
+    .bg-excellent { background-color: var(--excellent); }
+    .bg-good { background-color: var(--good); }
+    .bg-moderate { background-color: var(--moderate); }
+    .bg-improvement { background-color: var(--improvement); }
+    .bg-intervention { background-color: var(--intervention); }
+    
+    .badge-bloom { background-color: #e2e8f0; color: #334155; font-weight: 500; }
+
+    /* Editable Teacher Sections */
+    .teacher-section { display: grid; grid-template-columns: repeat(auto-fit, minmax(450px, 1fr)); gap: 20px; margin-bottom: 24px; }
+    .field-card { background: var(--card-bg); padding: 20px; border-radius: 10px; border: 1px solid var(--border); }
+    .field-card h2 { font-size: 1.1rem; color: var(--primary); margin-bottom: 10px; }
+    .field-card p { font-size: 0.8rem; color: #64748b; margin-bottom: 12px; }
+    textarea { width: 100%; height: 140px; padding: 12px; border: 1px solid var(--border); border-radius: 6px; font-size: 0.9rem; resize: vertical; }
+    textarea:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 2px rgba(30, 58, 138, 0.2); }
+
+    /* Print Styles for PDF Export */
+    @media print {
+      body { padding: 0; background: white; }
+      .btn-group, header p { display: none; }
+      header { background: none; color: black; padding: 0 0 12px 0; border-bottom: 2px solid black; border-radius: 0; }
+      .table-container { max-height: none; overflow: visible; }
+      .card, .chart-card, .field-card, .table-card { border: none; box-shadow: none; padding: 10px 0; }
+      textarea { border: none; padding: 0; font-size: 0.95rem; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <header>
+    <div>
+      <h1>Social Science CBA Analysis & Report</h1>
+      <p>Class Competency-Based Assessment Summary | Total Responses: 71 | Class Avg: 15.85 / 30</p>
+    </div>
+    <div class="btn-group">
+      <button class="btn btn-excel" onclick="exportExcel()">Export Excel (.csv)</button>
+      <button class="btn btn-pdf" onclick="window.print()">Save / Print PDF</button>
+    </div>
+  </header>
+
+  <!-- Summary Cards -->
+  <div class="metrics-grid">
+    <div class="card"><h3>Total Students</h3><div class="value">71</div></div>
+    <div class="card"><h3>Average Score</h3><div class="value">15.85 / 30</div></div>
+    <div class="card"><h3>Good / Excellent (≥70%)</h3><div class="value" style="color: var(--excellent);">5 Questions</div></div>
+    <div class="card"><h3>Moderate (45%–69%)</h3><div class="value" style="color: var(--moderate);">15 Questions</div></div>
+    <div class="card"><h3>Intervention Needed (<45%)</h3><div class="value" style="color: var(--intervention);">10 Questions</div></div>
+  </div>
+
+  <!-- Interactive Charts -->
+  <div class="charts-grid">
+    <div class="chart-card">
+      <h2>Performance Band Distribution</h2>
+      <canvas id="donutChart"></canvas>
+    </div>
+    <div class="chart-card">
+      <h2>Accuracy by Bloom's Taxonomy Level</h2>
+      <canvas id="barChart"></canvas>
+    </div>
+  </div>
+
+  <!-- Interactive Table -->
+  <div class="table-card">
+    <h2>Detailed Question-Wise Breakdown (30 Items)</h2>
+    <div class="table-container">
+      <table id="cbaTable">
+        <thead>
+          <tr>
+            <th>Q.No.</th>
+            <th>Full Question</th>
+            <th>Answer Key</th>
+            <th>Question Type</th>
+            <th>Bloom's Level</th>
+            <th>Correct</th>
+            <th>Accuracy %</th>
+            <th>Other Options (Exact Counts)</th>
+            <th>Performance Level</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Rows injected dynamically via JS -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Editable Teacher Input Sections -->
+  <div class="teacher-section">
+    <div class="field-card">
+      <h2>Teacher's Misconception & Gap Notes</h2>
+      <p>Enter qualitative observations explaining distractor patterns (Auto-saves locally):</p>
+      <textarea id="misconceptionInput" placeholder="e.g., In Q19, 43 students incorrectly chose 'benefit few states' due to confusion regarding national land schemes..."></textarea>
+    </div>
+    <div class="field-card">
+      <h2>Remedial & Action Plan</h2>
+      <p>Outline targeted classroom interventions and activity steps:</p>
+      <textarea id="remediationInput" placeholder="e.g., Conduct a focused review session on regional party dynamics and crop geographical conditions before the mid-term revision..."></textarea>
+    </div>
+  </div>
+</div>
+
+<script>
+// 30 Question Dataset
+const dataset = [
+  {qno: 1, question: "Why are political parties necessary for democracy?", key: "Political Parties ensure accountability for the nation and not only their constituencies", type: "Conceptual", bloom: "Understand", correct: 39, accuracy: 54.9, options: "Dynastic succession – 14; Independent candidates – 6; Women participation – 12", level: "Moderate"},
+  {qno: 2, question: "Identify an advantage of an alliance government.", key: "There is more regional representation", type: "Conceptual", bloom: "Understand", correct: 30, accuracy: 42.3, options: "Not democratic in nature – 7; Monetary check – 12; Regional considerations – 22", level: "Needs Improvement"},
+  {qno: 3, question: "Winning the elections permits political parties to do which of the following?", key: "Forming the Central or State governments", type: "Knowledge / Recall", bloom: "Remember", correct: 44, accuracy: 62.0, options: "Electing Governor – 13; Election Commission – 10; Selecting judges – 4", level: "Moderate"},
+  {qno: 4, question: "Consider the following statements on political parties. Which of these is TRUE?", key: "R and S", type: "Statement-based", bloom: "Analyse", correct: 24, accuracy: 33.8, options: "P and Q – 8; Q and R – 26; S and P – 13", level: "Needs Intervention"},
+  {qno: 5, question: "Which of the following is NOT a way in which regional political parties strengthen democracy in India?", key: "By strengthening the dominance of national political parties", type: "Conceptual / Negative", bloom: "Analyse", correct: 25, accuracy: 35.2, options: "Diversity – 22; Grass-roots participation – 17; Safeguard minorities – 7", level: "Needs Intervention"},
+  {qno: 6, question: "An alliance government has difficulty in implementing any long-term schemes. Which of the following is NOT a reason for it?", key: "Maintaining an alliance government is expensive and hence budget is hampered", type: "Reasoning-based", bloom: "Analyse", correct: 28, accuracy: 39.4, options: "No majority – 25; Short-lived – 11; Clashing ideologies – 7", level: "Needs Intervention"},
+  {qno: 7, question: "Which of the following is a feature of a one-party system?", key: "Only Q", type: "Knowledge / Recall", bloom: "Remember", correct: 50, accuracy: 70.4, options: "Only P – 3; Both P and Q – 15; Neither – 3", level: "Good"},
+  {qno: 8, question: "Assertion (A): Political parties promote the interests of their voters. Reason (R): Political parties have been identified with social and political ideological divisions.", key: "Both A and R are true but R does not explain A", type: "Assertion–Reason", bloom: "Analyse", correct: 20, accuracy: 28.2, options: "A true, R false – 5; A false, R true – 12; Both true and R explains A – 34", level: "Needs Intervention"},
+  {qno: 9, question: "Assertion (A): Even in democratic countries the rich have more political power than the poor. Reason (R): Parties frequently take shortcuts like taking the support of corporations to win elections.", key: "Both A and R are true and R explains A", type: "Assertion–Reason", bloom: "Analyse", correct: 45, accuracy: 63.4, options: "A true, R false – 4; A false, R true – 9; Both true but R doesn't explain A – 13", level: "Moderate"},
+  {qno: 10, question: "A bill is introduced and passed in both Houses within two days. The opposition, in a democracy, is important because…", key: "It should scrutinise the bills proposed by the government and provide criticism", type: "Case / Situation-based", bloom: "Analyse", correct: 29, accuracy: 40.8, options: "Alternative government – 19; Speed/mobility – 12; Mould public opinion – 11", level: "Needs Intervention"},
+  {qno: 11, question: "Which of the following is DEFINITELY strengthening federalism in India?", key: "Multiple regional parties coming together to form a coalition government at the center", type: "Conceptual", bloom: "Analyse", correct: 39, accuracy: 54.9, options: "Two national parties win most states – 9; Regional party wins one state – 8; National party wins majority – 15", level: "Moderate"},
+  {qno: 12, question: "Which of the following is a demerit of a bi-party system?", key: "Restricted choice for voters", type: "Conceptual", bloom: "Understand", correct: 41, accuracy: 57.7, options: "Unstable government – 18; Lack of accountability – 7; No continuation of policies – 5", level: "Moderate"},
+  {qno: 13, question: "Which of the following issues will MOST LIKELY be dealt with by members of a regional party?", key: "Disaster management in a village", type: "Application-based", bloom: "Apply", correct: 40, accuracy: 56.3, options: "Mobile towers – 11; Highways/expressways – 13; Central universities – 7", level: "Moderate"},
+  {qno: 14, question: "_________ is a group of people who come together to contest elections and hold power in the government.", key: "Political party", type: "Definition-based", bloom: "Remember", correct: 63, accuracy: 88.7, options: "Pressure group – 5; Interest group – 2; Business lobby – 1", level: "Excellent"},
+  {qno: 15, question: "Political parties reflect fundamental _______ in a society. Parties are about a part of society and thus involve PARTISANSHIP.", key: "Political divisions", type: "Conceptual", bloom: "Understand", correct: 20, accuracy: 28.2, options: "Social divisions – 26; Economic divisions – 14; Religious divisions – 11", level: "Needs Intervention"},
+  {qno: 16, question: "Shyam desires to relocate to produce rice. What should he search for?", key: "Well-drained soil", type: "Application-based", bloom: "Apply", correct: 24, accuracy: 33.8, options: "Moderate rainfall – 33; Cold climate – 5; Dense forest – 9", level: "Needs Intervention"},
+  {qno: 17, question: "Map of India crops – which region grows food crops?", key: "Northern Plains mostly grow food crops", type: "Map-based", bloom: "Apply", correct: 34, accuracy: 47.9, options: "Southern India tea – 9; Fibre crops cold regions – 9; Western India wheat – 19", level: "Needs Improvement"},
+  {qno: 18, question: "Ramu bought land with black soil. Which crops?", key: "Cotton and sugarcane", type: "Application-based", bloom: "Apply", correct: 43, accuracy: 60.6, options: "Jute & tea – 9; Millets & coffee – 7; Rice & wheat – 12", level: "Moderate"},
+  {qno: 19, question: "Why did India introduce land development program (1980s–90s)?", key: "To help farmers grow crops produced in subsidised countries", type: "Conceptual / Reasoning", bloom: "Understand", correct: 18, accuracy: 25.4, options: "Benefit few states – 43; Buy redistributed land – 5; Encourage organic farming – 5", level: "Needs Intervention"},
+  {qno: 20, question: "Intensive farming – NOT a feature?", key: "Organic manure", type: "Conceptual / Negative", bloom: "Understand", correct: 38, accuracy: 53.5, options: "HYV seeds – 17; System irrigation – 7; Modern tools – 9", level: "Moderate"},
+  {qno: 21, question: "Coffee grows best in tropical climate – suitable region?", key: "Hot & humid southern peninsula", type: "Application-based", bloom: "Apply", correct: 27, accuracy: 38.0, options: "Cold NE hills – 17; Rainfed northern plains – 17; Hot dry desert – 10", level: "Needs Intervention"},
+  {qno: 22, question: "Assertion (A): Primitive subsistence farming depends on modern tools. Reason (R): Farmers use hoe, dao, digging sticks.", key: "A is false, R is true", type: "Assertion–Reason", bloom: "Analyse", correct: 37, accuracy: 52.1, options: "Both true & R explains A – 17; Both true but R doesn't explain A – 12; A true, R false – 5", level: "Moderate"},
+  {qno: 23, question: "Assertion (A): Rabi crops are sown in winter and harvested in summer. Reason (R): These crops require low temperatures for germination and grow well with winter precipitation.", key: "Both A and R are true, and R explains A", type: "Assertion–Reason", bloom: "Analyse", correct: 48, accuracy: 67.6, options: "Both true but R doesn't explain A – 10; A true, R false – 10; A false, R true – 3", level: "Good"},
+  {qno: 24, question: "Assertion (A): Millets like jowar and bajra can be grown in areas with less fertile soil and low rainfall. Reason (R): These crops are highly dependent on irrigation and HYV seeds.", key: "A is true, R is false", type: "Assertion–Reason", bloom: "Analyse", correct: 34, accuracy: 47.9, options: "Both true & R explains A – 15; Both true but R doesn't explain A – 19; A false, R true – 3", level: "Needs Improvement"},
+  {qno: 25, question: "Assertion (A): Green Revolution led to an increase in agricultural production in India. Reason (R): Green Revolution introduced HYV seeds and modern technology.", key: "Both A and R are true, and R explains A", type: "Assertion–Reason", bloom: "Analyse", correct: 50, accuracy: 70.4, options: "Both true but R doesn't explain A – 11; A true, R false – 8; A false, R true – 2", level: "Good"},
+  {qno: 26, question: "Rearing of silkworms for silk fibre is known as…", key: "Sericulture", type: "Definition-based", bloom: "Remember", correct: 55, accuracy: 77.5, options: "Viticulture – 5; Horticulture – 6; Agriculture – 5", level: "Good"},
+  {qno: 27, question: "Which of the following is not correct about plantation farming?", key: "Farmers clear land by felling trees and burning them (shifting cultivation, not plantation)", type: "Conceptual / Negative", bloom: "Analyse", correct: 37, accuracy: 52.1, options: "Single crop on large area – 11; Interface of agriculture & industry – 10; Estates – 13", level: "Moderate"},
+  {qno: 28, question: "Kharif crops are grown…", key: "With onset of monsoon, harvested Sept–Oct", type: "Knowledge / Recall", bloom: "Remember", correct: 48, accuracy: 67.6, options: "Winter & summer – 11; Autumn & summer – 9; None – 3", level: "Good"},
+  {qno: 29, question: "A short season between rabi and kharif is known as…", key: "Zaid", type: "Knowledge / Recall", bloom: "Remember", correct: 56, accuracy: 78.9, options: "Aus – 5; Boro – 6; None – 4", level: "Good"},
+  {qno: 30, question: "The two main wheat growing regions are:", key: "The Ganga–Sutlej plains and the Deccan Trap", type: "Map / Geographical Application", bloom: "Apply", correct: 39, accuracy: 54.9, options: "North-eastern part and eastern-coastal plains – 21; Deccan plateau and Konkan coast – 8; None of the above – 3", level: "Moderate"}
+];
+
+// Map CSS Badges
+function getBadgeClass(level) {
+  switch(level) {
+    case 'Excellent': return 'bg-excellent';
+    case 'Good': return 'bg-good';
+    case 'Moderate': return 'bg-moderate';
+    case 'Needs Improvement': return 'bg-improvement';
+    case 'Needs Intervention': return 'bg-intervention';
+    default: return '';
+  }
+}
+
+// Render Table
+const tbody = document.querySelector('#cbaTable tbody');
+dataset.forEach(row => {
+  const tr = document.createElement('tr');
+  tr.innerHTML = `
+    <td><strong>${row.qno}</strong></td>
+    <td>${row.question}</td>
+    <td><em>${row.key}</em></td>
+    <td>${row.type}</td>
+    <td><span class="badge badge-bloom">${row.bloom}</span></td>
+    <td>${row.correct}</td>
+    <td><strong>${row.accuracy.toFixed(1)}%</strong></td>
+    <td style="color: #64748b; font-size: 0.8rem;">${row.options}</td>
+    <td><span class="badge ${getBadgeClass(row.level)}">${row.level}</span></td>
+  `;
+  tbody.appendChild(tr);
+});
+
+// Render Charts
+new Chart(document.getElementById('donutChart'), {
+  type: 'doughnut',
+  data: {
+    labels: ['Good / Excellent (≥70%)', 'Moderate (45–69%)', 'Intervention Needed (<45%)'],
+    datasets: [{
+      data: [5, 15, 10],
+      backgroundColor: ['#16a34a', '#d97706', '#dc2626']
+    }]
+  },
+  options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
+});
+
+new Chart(document.getElementById('barChart'), {
+  type: 'bar',
+  data: {
+    labels: ['Remember', 'Understand', 'Apply', 'Analyse'],
+    datasets: [{
+      label: 'Average Accuracy %',
+      data: [72.6, 44.8, 48.3, 47.9],
+      backgroundColor: '#2563eb'
+    }]
+  },
+  options: { responsive: true, scales: { y: { beginAtZero: true, max: 100 } } }
+});
+
+// Auto-Save Teacher Inputs in Browser LocalStorage
+const miscInput = document.getElementById('misconceptionInput');
+const remInput = document.getElementById('remediationInput');
+
+miscInput.value = localStorage.getItem('cba_misconception') || '';
+remInput.value = localStorage.getItem('cba_remediation') || '';
+
+miscInput.addEventListener('input', () => localStorage.setItem('cba_misconception', miscInput.value));
+remInput.addEventListener('input', () => localStorage.setItem('cba_remediation', remInput.value));
+
+// Export Table to Excel (.csv)
+function exportExcel() {
+  let csv = 'Q.No,Full Question,Answer Key,Question Type,Bloom Level,Correct Responses,Accuracy %,Other Options,Performance Level\n';
+  dataset.forEach(row => {
+    csv += `"${row.qno}","${row.question.replace(/"/g, '""')}","${row.key.replace(/"/g, '""')}","${row.type}","${row.bloom}",${row.correct},${row.accuracy},"${row.options.replace(/"/g, '""')}","${row.level}"\n`;
+  });
+  
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const link = document.createElement("a");
+  link.href = URL.createObjectURL(blob);
+  link.setAttribute("download", "Social_Science_CBA_Analysis.csv");
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+}
+</script>
+
+</body>
+</html>
